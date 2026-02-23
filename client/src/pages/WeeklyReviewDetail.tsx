@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { domToBlob } from "modern-screenshot";
-import { inlineImagesAsBase64 } from "@/lib/imageToBase64";
+import { imageToBase64 } from "@/lib/imageToBase64";
 
 export default function WeeklyReviewDetail() {
   const params = useParams<{ weekStart: string }>();
@@ -18,21 +18,24 @@ export default function WeeklyReviewDetail() {
   );
 
   const handleExport = useCallback(async (element: HTMLDivElement) => {
+    // Collect all img elements and their original src values
+    const imgs = Array.from(element.querySelectorAll<HTMLImageElement>("img"));
+    const originalSrcs = imgs.map((img) => img.src);
+
     try {
       toast.info("正在生成图片...");
 
-      // Clone the element to avoid mutating the live DOM
-      const clone = element.cloneNode(true) as HTMLDivElement;
-      clone.style.position = "fixed";
-      clone.style.top = "-9999px";
-      clone.style.left = "-9999px";
-      clone.style.width = element.offsetWidth + "px";
-      document.body.appendChild(clone);
+      // Temporarily replace img src with base64 to bypass CORS in modern-screenshot
+      await Promise.all(
+        imgs.map(async (img) => {
+          const src = img.getAttribute("src");
+          if (!src || src.startsWith("data:")) return;
+          const base64 = await imageToBase64(src);
+          img.src = base64;
+        })
+      );
 
-      // Convert all images to base64 to bypass CORS restrictions
-      await inlineImagesAsBase64(clone);
-
-      const blob = await domToBlob(clone, {
+      const blob = await domToBlob(element, {
         scale: 2,
         backgroundColor: "#FFF5F0",
         features: {
@@ -40,14 +43,10 @@ export default function WeeklyReviewDetail() {
         },
       });
 
-      // Clean up clone
-      document.body.removeChild(clone);
-
       if (!blob) {
         throw new Error("Failed to generate image blob");
       }
 
-      // Use blob URL for download (more reliable than data URL)
       const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.download = `weekly-review-${weekStart}.png`;
@@ -55,14 +54,17 @@ export default function WeeklyReviewDetail() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      // Clean up blob URL after a short delay
       setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
 
       toast.success("图片已保存！");
     } catch (err) {
       console.error("Export failed:", err);
       toast.error("导出失败，请重试");
+    } finally {
+      // Always restore original src values
+      imgs.forEach((img, i) => {
+        img.src = originalSrcs[i]!;
+      });
     }
   }, [weekStart]);
 

@@ -8,13 +8,24 @@
 
 const cache = new Map<string, string>();
 
+/**
+ * Convert an image URL to base64 via the server-side proxy.
+ * The proxy fetches the image server-side and returns it with CORS headers,
+ * bypassing any CDN CORS restrictions.
+ */
 export async function imageToBase64(url: string): Promise<string> {
   if (cache.has(url)) {
     return cache.get(url)!;
   }
 
+  // Skip if already a data URL
+  if (url.startsWith("data:")) return url;
+
   try {
-    const response = await fetch(url, { mode: "cors" });
+    // Use server-side proxy to avoid CORS issues with external CDN images
+    const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(url)}`;
+    const response = await fetch(proxyUrl);
+    if (!response.ok) throw new Error(`Proxy returned ${response.status}`);
     const blob = await response.blob();
     const dataUrl = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -24,9 +35,9 @@ export async function imageToBase64(url: string): Promise<string> {
     });
     cache.set(url, dataUrl);
     return dataUrl;
-  } catch {
-    // If CORS fails, return the original URL as fallback
-    console.warn("[imageToBase64] Failed to convert:", url);
+  } catch (err) {
+    // If proxy fails, return the original URL as fallback
+    console.warn("[imageToBase64] Failed to convert:", url, err);
     return url;
   }
 }

@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { domToBlob } from "modern-screenshot";
-import { inlineImagesAsBase64 } from "@/lib/imageToBase64";
+import { imageToBase64 } from "@/lib/imageToBase64";
 import { trpc } from "@/lib/trpc";
 import { TASK_TYPES, TASK_MAP, STAR_THRESHOLD, LOTUS_THRESHOLD, type TaskType } from "../../../shared/tasks";
 import { CAT_IMAGES, getCatState } from "../../../shared/catImages";
@@ -434,25 +434,28 @@ function DayDetailDialog({
   const handleExport = useCallback(async () => {
     if (!exportRef.current || !dateStr) return;
     setIsExporting(true);
+
+    // Collect all img elements and their original src values
+    const el = exportRef.current;
+    const imgs = Array.from(el.querySelectorAll<HTMLImageElement>("img"));
+    const originalSrcs = imgs.map((img) => img.src);
+
     try {
-      // Clone the export area so we can mutate img src without affecting the live DOM
-      const clone = exportRef.current.cloneNode(true) as HTMLElement;
-      clone.style.position = "fixed";
-      clone.style.top = "-9999px";
-      clone.style.left = "-9999px";
-      clone.style.width = exportRef.current.offsetWidth + "px";
-      document.body.appendChild(clone);
+      // Temporarily replace img src with base64 to bypass CORS in modern-screenshot
+      await Promise.all(
+        imgs.map(async (img) => {
+          const src = img.getAttribute("src");
+          if (!src || src.startsWith("data:")) return;
+          const base64 = await imageToBase64(src);
+          img.src = base64;
+        })
+      );
 
-      // Convert all images to base64 to bypass CORS restrictions
-      await inlineImagesAsBase64(clone);
-
-      const blob = await domToBlob(clone, {
+      const blob = await domToBlob(el, {
         scale: 2,
         backgroundColor: "#FFF5F0",
         features: { removeControlCharacter: false },
       });
-      // Clean up clone
-      document.body.removeChild(clone);
 
       if (!blob) throw new Error("Failed to generate image");
       const blobUrl = URL.createObjectURL(blob);
@@ -468,6 +471,10 @@ function DayDetailDialog({
       console.error("Export failed:", err);
       toast.error("导出失败，请重试");
     } finally {
+      // Always restore original src values
+      imgs.forEach((img, i) => {
+        img.src = originalSrcs[i]!;
+      });
       setIsExporting(false);
     }
   }, [dateStr]);

@@ -81,3 +81,12 @@
 - [x] 全项目文案更新：猫猫正式命名为"司马黑"（评语、UI 文案、弹窗提示等）
 - [x] 更新 HANDOVER_CHECK.md
 - [x] 推送代码到 GitHub
+
+## v2.3 修复导出空白图片 Bug
+
+- [x] 修复 CalendarView.tsx：移除 clone 方案，直接在原始元素上导出，img src 临时替换后还原
+- [x] 修复 WeeklyReviewDetail.tsx：同上
+- [x] 新增服务端图片代理路由 /api/proxy-image（绕过 CDN CORS）
+- [x] 更新 imageToBase64 通过代理地址获取图片
+- [x] 测试验证：55 个 Vitest 测试全部通过
+- [ ] 推送代码到 GitHub
