@@ -111,7 +111,7 @@ export default function WeeklyReviewCard({ data, onExport }: WeeklyReviewCardPro
           {/* Cat */}
           <img
             src={catImage}
-            alt="Fat Black Cat"
+            alt="司马黑"
             className="w-24 h-24 object-contain drop-shadow-md flex-shrink-0"
           />
         </div>

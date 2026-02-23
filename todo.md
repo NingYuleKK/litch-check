@@ -72,3 +72,12 @@
 - [x] 创建可导出的每日结算卡片内容区域（含日期、猫猫、完成情况、任务列表、今日随笔）
 - [x] 使用 modern-screenshot domToBlob 导出为 PNG
 - [x] 推送代码到 GitHub
+
+## v2.2 猫猫导出修复 + 司马黑命名
+
+- [x] 创建 imageToBase64 工具函数（fetch 图片 URL 转 base64 dataURL）
+- [x] 修复每日详情弹窗导出：导出前将猫猫图片转 base64 内嵌
+- [x] 修复周报结算卡片导出：导出前将猫猫图片转 base64 内嵌
+- [x] 全项目文案更新：猫猫正式命名为"司马黑"（评语、UI 文案、弹窗提示等）
+- [x] 更新 HANDOVER_CHECK.md
+- [ ] 推送代码到 GitHub

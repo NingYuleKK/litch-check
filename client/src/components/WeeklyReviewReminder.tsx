@@ -70,13 +70,13 @@ export default function WeeklyReviewReminder() {
           {/* Cat image */}
           <img
             src={CAT_IMAGES.encourage}
-            alt="Cat"
+            alt="司马黑"
             className="w-20 h-20 mx-auto mb-3 object-contain drop-shadow-md"
           />
 
           <DialogHeader>
             <DialogTitle className="text-lg font-black tracking-tight">
-              上周周报来啦！
+              司马黑带上周报来了！
             </DialogTitle>
           </DialogHeader>
 

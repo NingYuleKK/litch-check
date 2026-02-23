@@ -1,7 +1,9 @@
 /**
  * Cat mascot image CDN URLs.
+ * The mascot is a fat black cat officially named "司马黑" (司马黑).
  * 4 states based on daily check-in completion.
  */
+export const CAT_NAME = "司马黑";
 export const CAT_IMAGES = {
   /** Normal/idle state - default mascot */
   normal: "https://files.manuscdn.com/user_upload_by_module/session_file/86672527/BglxMwZIXlCzeEKM.png",
@@ -38,23 +40,23 @@ export function getCatState(completedCount: number): CatState {
 export const CAT_DIALOGUES: Record<CatState, string[]> = {
   normal: [
     "Litch 还不来快活吗？",
-    "今天打算躺平？本猫不同意。",
+    "今天打算躺平？司马黑不同意。",
     "醒醒，你的五个任务在哭泣。",
-    "又想摸鱼？被本猫抓到了吧。",
+    "又想摸鱼？被司马黑抓到了吧。",
   ],
   lazy: [
-    "才这点？你在逗我？",
+    "才这点？你在逗司马黑？",
     "加油啊，离星星还差一点点。",
-    "本猫相信你不止于此。",
+    "司马黑相信你不止于此。",
   ],
   encourage: [
-    "不错嘛，今天有点东西。",
-    "三个了！本猫赐你一颗星。",
+    "不错嘘，今天有点东西。",
+    "三个了！司马黑赐你一颗星。",
   ],
   perfect: [
-    "大圆满！本猫为你骄傲！",
-    "完美的一天，值得抱莲花庆祝。",
-    "你是本猫见过最自律的人类。",
+    "大圆满！司马黑为你骄傲！",
+    "完美的一天，司马黑赐你一朵莲花。",
+    "你是司马黑见过最自律的人类。",
   ],
 };
 
@@ -63,10 +65,10 @@ export const CAT_DIALOGUES: Record<CatState, string[]> = {
  * These are appended to the main dialogue when streak milestones are hit.
  */
 export const STREAK_MESSAGES: { threshold: number; messages: string[] }[] = [
-  { threshold: 30, messages: ["一个月！本猫跪了。🙇"] },
+  { threshold: 30, messages: ["一个月！司马黑跪了。🙇"] },
   { threshold: 14, messages: ["两周连胜，你是机器人吗？🤖"] },
-  { threshold: 7, messages: ["一周了，太厉害了！💪"] },
-  { threshold: 3, messages: ["三天了，开始有点意思。😏"] },
+  { threshold: 7, messages: ["一周了，司马黑为你鼓掌！💪"] },
+  { threshold: 3, messages: ["三天了，司马黑还没跪。😏"] },
 ];
 
 /**
@@ -115,8 +117,8 @@ function hashCode(str: string): number {
 // ─── Legacy exports (kept for backward compat) ─────────────────
 
 export const CAT_MESSAGES: Record<CatState, { title: string; subtitle: string }> = {
-  normal: { title: "准备好了吗？", subtitle: "开始今天的打卡吧！" },
-  lazy: { title: "还差一点哦~", subtitle: "再加把劲，完成3个获得认可！" },
-  encourage: { title: "猫猫认可！", subtitle: "太棒了，继续保持！" },
-  perfect: { title: "大圆满！", subtitle: "今天全部完成，完美！" },
+  normal: { title: "准备好了吗？", subtitle: "司马黑在等你开始打卡！" },
+  lazy: { title: "还差一点哦~", subtitle: "再加把劲，完成个获得司马黑认可！" },
+  encourage: { title: "司马黑认可！", subtitle: "太棒了，继续保持！" },
+  perfect: { title: "大圆满！", subtitle: "司马黑为你骄傲！" },
 };

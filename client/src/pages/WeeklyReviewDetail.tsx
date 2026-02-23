@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { domToBlob } from "modern-screenshot";
+import { inlineImagesAsBase64 } from "@/lib/imageToBase64";
 
 export default function WeeklyReviewDetail() {
   const params = useParams<{ weekStart: string }>();
@@ -20,13 +21,27 @@ export default function WeeklyReviewDetail() {
     try {
       toast.info("正在生成图片...");
 
-      const blob = await domToBlob(element, {
+      // Clone the element to avoid mutating the live DOM
+      const clone = element.cloneNode(true) as HTMLDivElement;
+      clone.style.position = "fixed";
+      clone.style.top = "-9999px";
+      clone.style.left = "-9999px";
+      clone.style.width = element.offsetWidth + "px";
+      document.body.appendChild(clone);
+
+      // Convert all images to base64 to bypass CORS restrictions
+      await inlineImagesAsBase64(clone);
+
+      const blob = await domToBlob(clone, {
         scale: 2,
         backgroundColor: "#FFF5F0",
         features: {
           removeControlCharacter: false,
         },
       });
+
+      // Clean up clone
+      document.body.removeChild(clone);
 
       if (!blob) {
         throw new Error("Failed to generate image blob");

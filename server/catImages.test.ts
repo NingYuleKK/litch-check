@@ -102,14 +102,14 @@ describe("getStreakMessage", () => {
 
   it("returns 3-day message for streak 3-6", () => {
     const msg = getStreakMessage(3);
-    expect(msg).toBe("三天了，开始有点意思。😏");
-    expect(getStreakMessage(6)).toBe("三天了，开始有点意思。😏");
+    expect(msg).toBe("三天了，司马黑还没跪。😏");
+    expect(getStreakMessage(6)).toBe("三天了，司马黑还没跪。😏");
   });
 
   it("returns 7-day message for streak 7-13", () => {
     const msg = getStreakMessage(7);
-    expect(msg).toBe("一周了，太厉害了！💪");
-    expect(getStreakMessage(13)).toBe("一周了，太厉害了！💪");
+    expect(msg).toBe("一周了，司马黑为你鼓掌！💪");
+    expect(getStreakMessage(13)).toBe("一周了，司马黑为你鼓掌！💪");
   });
 
   it("returns 14-day message for streak 14-29", () => {
@@ -120,7 +120,7 @@ describe("getStreakMessage", () => {
 
   it("returns 30-day message for streak >= 30", () => {
     const msg = getStreakMessage(30);
-    expect(msg).toBe("一个月！本猫跪了。🙇");
-    expect(getStreakMessage(100)).toBe("一个月！本猫跪了。🙇");
+    expect(msg).toBe("一个月！司马黑跪了。🙇");
+    expect(getStreakMessage(100)).toBe("一个月！司马黑跪了。🙇");
   });
 });

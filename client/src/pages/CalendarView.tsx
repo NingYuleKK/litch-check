@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { domToBlob } from "modern-screenshot";
+import { inlineImagesAsBase64 } from "@/lib/imageToBase64";
 import { trpc } from "@/lib/trpc";
 import { TASK_TYPES, TASK_MAP, STAR_THRESHOLD, LOTUS_THRESHOLD, type TaskType } from "../../../shared/tasks";
 import { CAT_IMAGES, getCatState } from "../../../shared/catImages";
@@ -434,31 +435,25 @@ function DayDetailDialog({
     if (!exportRef.current || !dateStr) return;
     setIsExporting(true);
     try {
-      // Pre-load all images in the export area to avoid blank images
-      const images = exportRef.current.querySelectorAll("img");
-      await Promise.all(
-        Array.from(images).map(
-          (img) =>
-            new Promise<void>((resolve) => {
-              if (img.complete && img.naturalWidth > 0) {
-                resolve();
-              } else {
-                img.onload = () => resolve();
-                img.onerror = () => resolve();
-                // Force reload with crossOrigin
-                const src = img.src;
-                img.crossOrigin = "anonymous";
-                img.src = "";
-                img.src = src;
-              }
-            })
-        )
-      );
-      const blob = await domToBlob(exportRef.current, {
+      // Clone the export area so we can mutate img src without affecting the live DOM
+      const clone = exportRef.current.cloneNode(true) as HTMLElement;
+      clone.style.position = "fixed";
+      clone.style.top = "-9999px";
+      clone.style.left = "-9999px";
+      clone.style.width = exportRef.current.offsetWidth + "px";
+      document.body.appendChild(clone);
+
+      // Convert all images to base64 to bypass CORS restrictions
+      await inlineImagesAsBase64(clone);
+
+      const blob = await domToBlob(clone, {
         scale: 2,
         backgroundColor: "#FFF5F0",
         features: { removeControlCharacter: false },
       });
+      // Clean up clone
+      document.body.removeChild(clone);
+
       if (!blob) throw new Error("Failed to generate image");
       const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -491,7 +486,7 @@ function DayDetailDialog({
               <div className="flex justify-center mb-2">
                 <img
                   src={CAT_IMAGES[catState]}
-                  alt="cat"
+                  alt="司马黑"
                   className="w-16 h-16 object-contain"
                 />
               </div>
@@ -502,7 +497,7 @@ function DayDetailDialog({
                 {isLotus ? (
                   <span>🪷 大圆满 · 完成 {completedCount}/{LOTUS_THRESHOLD}</span>
                 ) : isStar ? (
-                  <span>⭐ 猫猫认可 · 完成 {completedCount}/{LOTUS_THRESHOLD}</span>
+                  <span>⭐ 司马黑认可 · 完成 {completedCount}/{LOTUS_THRESHOLD}</span>
                 ) : (
                   <span>完成 {completedCount}/{LOTUS_THRESHOLD}</span>
                 )}

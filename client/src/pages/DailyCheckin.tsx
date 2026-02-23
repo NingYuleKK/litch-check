@@ -212,7 +212,7 @@ export default function DailyCheckin() {
                   : "bg-[#FFEAA7]/50 text-foreground"
               } border border-black/5`}
             >
-              {hasLotus ? "🪷 大圆满" : "⭐ 猫猫认可"}
+              {hasLotus ? "🪷 大圆满" : "⭐ 司马黑认可"}
             </motion.div>
           )}
         </AnimatePresence>
