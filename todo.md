@@ -71,4 +71,4 @@
 - [x] 在 DayDetailDialog 弹窗中添加"导出图片"按鈕
 - [x] 创建可导出的每日结算卡片内容区域（含日期、猫猫、完成情况、任务列表、今日随笔）
 - [x] 使用 modern-screenshot domToBlob 导出为 PNG
-- [ ] 推送代码到 GitHub
+- [x] 推送代码到 GitHub
