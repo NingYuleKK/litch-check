@@ -63,5 +63,5 @@
 - [x] 前端：本周"待结算"状态显示
 - [x] 前端：modern-screenshot 导出结算卡片为图片
 - [x] Vitest 测试：周报结算后端逻辑
-- [ ] 更新 HANDOVER_CHECK.md 交接文档
-- [ ] 推送代码到 GitHub
+- [x] 更新 HANDOVER_CHECK.md 交接文档
+- [x] 推送代码到 GitHub
