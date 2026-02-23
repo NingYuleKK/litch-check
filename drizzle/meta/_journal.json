@@ -1,5 +1,27 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1771832649581,
+      "tag": "0000_faulty_doctor_faustus",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1771832778086,
+      "tag": "0001_lethal_mephisto",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1771841601042,
+      "tag": "0002_opposite_the_fury",
+      "breakpoints": true
+    }
+  ]
 }
