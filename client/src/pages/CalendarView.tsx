@@ -1,10 +1,11 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { domToBlob } from "modern-screenshot";
 import { trpc } from "@/lib/trpc";
 import { TASK_TYPES, TASK_MAP, STAR_THRESHOLD, LOTUS_THRESHOLD, type TaskType } from "../../../shared/tasks";
 import { CAT_IMAGES, getCatState } from "../../../shared/catImages";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Flame, Pencil, Trash2, Check, X, BarChart3 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Flame, Pencil, Trash2, Check, X, BarChart3, Download } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -402,6 +403,8 @@ function DayDetailDialog({
   );
 
   const utils = trpc.useUtils();
+  const exportRef = useRef<HTMLDivElement>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const updateNoteMutation = trpc.checkin.updateNote.useMutation({
     onSuccess: () => {
@@ -427,80 +430,152 @@ function DayDetailDialog({
     return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
   };
 
+  const handleExport = useCallback(async () => {
+    if (!exportRef.current || !dateStr) return;
+    setIsExporting(true);
+    try {
+      // Pre-load all images in the export area to avoid blank images
+      const images = exportRef.current.querySelectorAll("img");
+      await Promise.all(
+        Array.from(images).map(
+          (img) =>
+            new Promise<void>((resolve) => {
+              if (img.complete && img.naturalWidth > 0) {
+                resolve();
+              } else {
+                img.onload = () => resolve();
+                img.onerror = () => resolve();
+                // Force reload with crossOrigin
+                const src = img.src;
+                img.crossOrigin = "anonymous";
+                img.src = "";
+                img.src = src;
+              }
+            })
+        )
+      );
+      const blob = await domToBlob(exportRef.current, {
+        scale: 2,
+        backgroundColor: "#FFF5F0",
+        features: { removeControlCharacter: false },
+      });
+      if (!blob) throw new Error("Failed to generate image");
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = `checkin-${dateStr}.png`;
+      link.href = blobUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      toast.success("图片已保存！");
+    } catch (err) {
+      console.error("Export failed:", err);
+      toast.error("导出失败，请重试");
+    } finally {
+      setIsExporting(false);
+    }
+  }, [dateStr]);
+
   return (
     <Dialog open={!!dateStr} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md mx-auto rounded-2xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-center">
-            {/* Cat image in dialog header */}
-            <div className="flex justify-center mb-2">
-              <img
-                src={CAT_IMAGES[catState]}
-                alt="cat"
-                className="w-16 h-16 object-contain"
-              />
-            </div>
-            <div className="font-extrabold text-lg tracking-tight">
-              {dateStr && formatDate(dateStr)}
-            </div>
-            <div className="text-sm font-normal text-muted-foreground mt-1">
-              {isLotus ? (
-                <span>🪷 大圆满 · 完成 {completedCount}/{LOTUS_THRESHOLD}</span>
-              ) : isStar ? (
-                <span>⭐ 猫猫认可 · 完成 {completedCount}/{LOTUS_THRESHOLD}</span>
-              ) : (
-                <span>完成 {completedCount}/{LOTUS_THRESHOLD}</span>
-              )}
-            </div>
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-2 mt-2">
-          {isLoading ? (
-            [...Array(5)].map((_, i) => (
-              <div key={i} className="h-12 bg-muted rounded-xl animate-pulse" />
-            ))
-          ) : (
-            TASK_TYPES.map((task) => {
-              const record = checkins?.find((c) => c.taskId === task.id);
-              const completed = record?.completed ?? false;
-              const note = record?.note ?? "";
-
-              return (
-                <TaskDetailItem
-                  key={task.id}
-                  task={task}
-                  completed={completed}
-                  note={note}
-                  dateStr={dateStr ?? ""}
-                  onUpdateNote={(newNote) => {
-                    updateNoteMutation.mutate({
-                      dateStr: dateStr ?? "",
-                      taskId: task.id,
-                      note: newNote,
-                    });
-                  }}
-                  onDeleteNote={() => {
-                    deleteNoteMutation.mutate({
-                      dateStr: dateStr ?? "",
-                      taskId: task.id,
-                    });
-                  }}
+        {/* Exportable card area */}
+        <div
+          ref={exportRef}
+          className="bg-gradient-to-b from-[#FFF5F0] via-white to-[#F0E6FF] rounded-2xl p-5"
+        >
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              {/* Cat image in dialog header */}
+              <div className="flex justify-center mb-2">
+                <img
+                  src={CAT_IMAGES[catState]}
+                  alt="cat"
+                  className="w-16 h-16 object-contain"
                 />
-              );
-            })
+              </div>
+              <div className="font-extrabold text-lg tracking-tight">
+                {dateStr && formatDate(dateStr)}
+              </div>
+              <div className="text-sm font-normal text-muted-foreground mt-1">
+                {isLotus ? (
+                  <span>🪷 大圆满 · 完成 {completedCount}/{LOTUS_THRESHOLD}</span>
+                ) : isStar ? (
+                  <span>⭐ 猫猫认可 · 完成 {completedCount}/{LOTUS_THRESHOLD}</span>
+                ) : (
+                  <span>完成 {completedCount}/{LOTUS_THRESHOLD}</span>
+                )}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-2 mt-2">
+            {isLoading ? (
+              [...Array(5)].map((_, i) => (
+                <div key={i} className="h-12 bg-muted rounded-xl animate-pulse" />
+              ))
+            ) : (
+              TASK_TYPES.map((task) => {
+                const record = checkins?.find((c) => c.taskId === task.id);
+                const completed = record?.completed ?? false;
+                const note = record?.note ?? "";
+
+                return (
+                  <TaskDetailItem
+                    key={task.id}
+                    task={task}
+                    completed={completed}
+                    note={note}
+                    dateStr={dateStr ?? ""}
+                    onUpdateNote={(newNote) => {
+                      updateNoteMutation.mutate({
+                        dateStr: dateStr ?? "",
+                        taskId: task.id,
+                        note: newNote,
+                      });
+                    }}
+                    onDeleteNote={() => {
+                      deleteNoteMutation.mutate({
+                        dateStr: dateStr ?? "",
+                        taskId: task.id,
+                      });
+                    }}
+                  />
+                );
+              })
+            )}
+          </div>
+
+          {/* Daily log section in dialog */}
+          {dailyLog?.content && (
+            <div className="mt-4 p-3 rounded-xl bg-[#C3B1E1]/10 border border-[#C3B1E1]/20">
+              <div className="text-xs font-bold text-[#C3B1E1] mb-1.5">📝 今日随笔</div>
+              <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                {dailyLog.content}
+              </p>
+            </div>
           )}
+
+          {/* Watermark */}
+          <div className="mt-4 text-center text-[10px] font-bold tracking-widest text-muted-foreground/40 uppercase">
+            Litch's Check
+          </div>
         </div>
 
-        {/* Daily log section in dialog */}
-        {dailyLog?.content && (
-          <div className="mt-4 p-3 rounded-xl bg-[#C3B1E1]/10 border border-[#C3B1E1]/20">
-            <div className="text-xs font-bold text-[#C3B1E1] mb-1.5">📝 今日随笔</div>
-            <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-              {dailyLog.content}
-            </p>
-          </div>
-        )}
+        {/* Export button — outside the exportable area */}
+        <div className="flex justify-end pt-2 pb-1 px-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExport}
+            disabled={isExporting || isLoading}
+            className="gap-1.5 font-bold border-2 border-black/10 hover:border-primary/40"
+          >
+            <Download className="w-3.5 h-3.5" />
+            {isExporting ? "生成中…" : "导出图片"}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
@@ -558,7 +633,7 @@ function TaskDetailItem({
       <div className="flex items-center gap-2">
         <TaskIcon task={task} size="sm" />
         <span
-          className={`font-bold text-sm ${
+          className={`font-bold text-sm whitespace-nowrap ${
             completed ? "" : "line-through"
           }`}
         >

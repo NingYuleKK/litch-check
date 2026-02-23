@@ -65,3 +65,10 @@
 - [x] Vitest 测试：周报结算后端逻辑
 - [x] 更新 HANDOVER_CHECK.md 交接文档
 - [x] 推送代码到 GitHub
+
+## v2.1 每日详情弹窗导出图片
+
+- [x] 在 DayDetailDialog 弹窗中添加"导出图片"按鈕
+- [x] 创建可导出的每日结算卡片内容区域（含日期、猫猫、完成情况、任务列表、今日随笔）
+- [x] 使用 modern-screenshot domToBlob 导出为 PNG
+- [ ] 推送代码到 GitHub
