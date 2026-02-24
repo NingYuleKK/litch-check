@@ -335,6 +335,54 @@ export async function upsertDailyLog(data: {
   }
 }
 
+// ─── GPT Comment Queries ──────────────────────────────────────
+
+/**
+ * Get GPT comment for a specific date.
+ */
+export async function getGptComment(dateStr: string): Promise<string | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select({ gptComment: dailyLogs.gptComment })
+    .from(dailyLogs)
+    .where(eq(dailyLogs.dateStr, dateStr))
+    .limit(1);
+
+  return result.length > 0 ? (result[0].gptComment ?? null) : null;
+}
+
+/**
+ * Save/update GPT comment for a specific date.
+ * Creates a daily_logs row if one doesn't exist yet.
+ */
+export async function upsertGptComment(data: {
+  dateStr: string;
+  gptComment: string;
+}): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await db
+    .select()
+    .from(dailyLogs)
+    .where(eq(dailyLogs.dateStr, data.dateStr))
+    .limit(1);
+
+  if (existing.length > 0) {
+    await db
+      .update(dailyLogs)
+      .set({ gptComment: data.gptComment })
+      .where(eq(dailyLogs.id, existing[0].id));
+  } else {
+    await db.insert(dailyLogs).values({
+      dateStr: data.dateStr,
+      gptComment: data.gptComment,
+    });
+  }
+}
+
 // ─── Weekly Review Queries ────────────────────────────────────
 
 /**

@@ -47,6 +47,7 @@ export const dailyLogs = mysqlTable("daily_logs", {
   id: int("id").autoincrement().primaryKey(),
   dateStr: varchar("dateStr", { length: 10 }).notNull().unique(), // "2026-02-22"
   content: text("content"),
+  gptComment: text("gptComment"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

@@ -116,6 +116,26 @@ vi.mock("./db", () => {
         });
       }
     }),
+    getGptComment: vi.fn(async (dateStr: string) => {
+      const log = logStore.get(dateStr);
+      return log ? ((log as any).gptComment ?? null) : null;
+    }),
+    upsertGptComment: vi.fn(async (data: { dateStr: string; gptComment: string }) => {
+      const existing = logStore.get(data.dateStr);
+      if (existing) {
+        (existing as any).gptComment = data.gptComment;
+        existing.updatedAt = new Date();
+      } else {
+        logStore.set(data.dateStr, {
+          id: nextLogId++,
+          dateStr: data.dateStr,
+          content: null,
+          gptComment: data.gptComment,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        } as any);
+      }
+    }),
     // Keep original exports
     getDb: vi.fn(),
     upsertUser: vi.fn(),
@@ -385,6 +405,61 @@ describe("dailyLog", () => {
 
     await expect(
       caller.dailyLog.save({ dateStr: "bad", content: "test" })
+    ).rejects.toThrow();
+  });
+});
+
+describe("gptComment", () => {
+  it("returns null gptComment for a date with no comment", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+
+    const result = await caller.gptComment.get({ dateStr: "2026-01-01" });
+    expect(result.gptComment).toBeNull();
+  });
+
+  it("saves and retrieves a GPT comment", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+
+    const saveResult = await caller.gptComment.save({
+      dateStr: "2026-02-28",
+      gptComment: "今天表现不错，继续保持！",
+    });
+    expect(saveResult).toEqual({ success: true });
+
+    const result = await caller.gptComment.get({ dateStr: "2026-02-28" });
+    expect(result.gptComment).toBe("今天表现不错，继续保持！");
+  });
+
+  it("updates an existing GPT comment", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+
+    await caller.gptComment.save({
+      dateStr: "2026-03-01",
+      gptComment: "初始批语",
+    });
+
+    await caller.gptComment.save({
+      dateStr: "2026-03-01",
+      gptComment: "更新后的批语",
+    });
+
+    const result = await caller.gptComment.get({ dateStr: "2026-03-01" });
+    expect(result.gptComment).toBe("更新后的批语");
+  });
+
+  it("validates dateStr format", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+
+    await expect(
+      caller.gptComment.get({ dateStr: "invalid" })
+    ).rejects.toThrow();
+
+    await expect(
+      caller.gptComment.save({ dateStr: "bad", gptComment: "test" })
     ).rejects.toThrow();
   });
 });

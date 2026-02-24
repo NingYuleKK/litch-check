@@ -403,9 +403,31 @@ function DayDetailDialog({
     { enabled: !!dateStr, refetchOnWindowFocus: false }
   );
 
+  // GPT Comment state
+  const { data: gptCommentData } = trpc.gptComment.get.useQuery(
+    { dateStr: dateStr ?? "" },
+    { enabled: !!dateStr, refetchOnWindowFocus: false }
+  );
+
   const utils = trpc.useUtils();
   const exportRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [isEditingGpt, setIsEditingGpt] = useState(false);
+  const [gptEditValue, setGptEditValue] = useState("");
+
+  // Sync gptEditValue when data changes
+  useEffect(() => {
+    setGptEditValue(gptCommentData?.gptComment ?? "");
+    setIsEditingGpt(false);
+  }, [gptCommentData?.gptComment, dateStr]);
+
+  const saveGptCommentMutation = trpc.gptComment.save.useMutation({
+    onSuccess: () => {
+      if (dateStr) utils.gptComment.get.invalidate({ dateStr });
+      toast.success("GPT 批语已保存");
+      setIsEditingGpt(false);
+    },
+  });
 
   const updateNoteMutation = trpc.checkin.updateNote.useMutation({
     onSuccess: () => {
@@ -559,6 +581,19 @@ function DayDetailDialog({
             </div>
           )}
 
+          {/* GPT Comment section — static display for export */}
+          {gptCommentData?.gptComment && (
+            <div
+              className="mt-4 p-3 rounded-xl bg-[#B8E8D0]/15 border border-[#7BCBA2]/20"
+              data-gpt-comment-display
+            >
+              <div className="text-xs font-bold text-[#5BA88A] mb-1.5">🤖 GPT 批语</div>
+              <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                {gptCommentData.gptComment}
+              </p>
+            </div>
+          )}
+
           {/* Watermark */}
           <div className="mt-4 text-center text-[10px] font-bold tracking-widest text-muted-foreground/40 uppercase">
             Litch's Check
@@ -577,6 +612,68 @@ function DayDetailDialog({
             <Download className="w-3.5 h-3.5" />
             {isExporting ? "生成中…" : "导出图片"}
           </Button>
+        </div>
+
+        {/* GPT Comment edit area — outside the exportable area */}
+        <div className="px-1 pb-2">
+          {isEditingGpt ? (
+            <div className="p-3 rounded-xl bg-[#B8E8D0]/15 border-2 border-dashed border-[#7BCBA2]/30">
+              <div className="text-xs font-bold text-[#5BA88A] mb-1.5">🤖 GPT 批语</div>
+              <textarea
+                value={gptEditValue}
+                onChange={(e) => setGptEditValue(e.target.value)}
+                rows={3}
+                autoFocus
+                placeholder="粘贴 GPT 的批语..."
+                className="w-full text-sm bg-white/60 rounded-lg p-2 resize-none border-0 focus:outline-none focus:ring-2 focus:ring-[#7BCBA2]/30"
+              />
+              <div className="flex items-center gap-1 mt-1.5">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    if (dateStr && gptEditValue.trim()) {
+                      saveGptCommentMutation.mutate({
+                        dateStr,
+                        gptComment: gptEditValue.trim(),
+                      });
+                    }
+                  }}
+                  disabled={!gptEditValue.trim() || saveGptCommentMutation.isPending}
+                  className="h-7 px-2 text-xs text-green-600 hover:text-green-700 hover:bg-green-50"
+                >
+                  <Check className="w-3.5 h-3.5 mr-1" />
+                  保存
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setGptEditValue(gptCommentData?.gptComment ?? "");
+                    setIsEditingGpt(false);
+                  }}
+                  className="h-7 px-2 text-xs text-muted-foreground"
+                >
+                  <X className="w-3.5 h-3.5 mr-1" />
+                  取消
+                </Button>
+              </div>
+            </div>
+          ) : !gptCommentData?.gptComment ? (
+            <button
+              onClick={() => setIsEditingGpt(true)}
+              className="w-full p-3 rounded-xl border-2 border-dashed border-[#7BCBA2]/20 hover:border-[#7BCBA2]/40 transition-colors text-left"
+            >
+              <span className="text-xs text-muted-foreground/40">🤖 粘贴 GPT 的批语...</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsEditingGpt(true)}
+              className="w-full text-left text-xs text-[#5BA88A]/60 hover:text-[#5BA88A] transition-colors py-1"
+            >
+              ✨ 编辑 GPT 批语
+            </button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

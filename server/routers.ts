@@ -12,6 +12,8 @@ import {
   calculateStreak,
   getDailyLog,
   upsertDailyLog,
+  getGptComment,
+  upsertGptComment,
   getWeeklyReview,
   getWeeklyReviews,
 } from "./db";
@@ -142,6 +144,32 @@ export const appRouter = router({
         await upsertDailyLog({
           dateStr: input.dateStr,
           content: input.content,
+        });
+        return { success: true };
+      }),
+  }),
+
+  gptComment: router({
+    /** Get GPT comment for a specific date */
+    get: publicProcedure
+      .input(z.object({ dateStr: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }))
+      .query(async ({ input }) => {
+        const comment = await getGptComment(input.dateStr);
+        return { gptComment: comment };
+      }),
+
+    /** Save/update GPT comment for a specific date */
+    save: publicProcedure
+      .input(
+        z.object({
+          dateStr: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+          gptComment: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await upsertGptComment({
+          dateStr: input.dateStr,
+          gptComment: input.gptComment,
         });
         return { success: true };
       }),
