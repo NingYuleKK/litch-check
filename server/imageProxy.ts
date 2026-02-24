@@ -11,7 +11,6 @@ import http from "http";
  *
  * Only allows fetching from trusted domains (manuscdn.com, etc.)
  */
-
 const ALLOWED_HOSTS = [
   "files.manuscdn.com",
   "manuscdn.com",
@@ -56,11 +55,9 @@ export function registerImageProxyRoute(app: Express) {
 
     const proxyReq = protocol.get(urlStr, (proxyRes) => {
       const contentType = proxyRes.headers["content-type"] || "image/png";
-
       res.setHeader("Content-Type", contentType);
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Cache-Control", "public, max-age=86400");
-
       proxyRes.pipe(res);
     });
 
