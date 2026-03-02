@@ -21,7 +21,7 @@ export interface ExerciseAction {
   name: string;
   /** Optional description / notes */
   description?: string;
-  /** Image URL for the action (司马黑 doing the exercise) — placeholder for now */
+  /** Image URL for the action (司马黑 doing the exercise) */
   imageUrl?: string;
   /** Sets performed */
   sets: ExerciseSet[];
@@ -55,7 +55,7 @@ export interface StarredAction {
   name: string;
   /** Optional description */
   description?: string;
-  /** Image URL (placeholder) */
+  /** Image URL */
   imageUrl?: string;
   /** Default type */
   type: "sets" | "duration";
@@ -71,20 +71,20 @@ export interface StarredAction {
 export const EXERCISE_PLACEHOLDER_IMAGE = "https://files.manuscdn.com/user_upload_by_module/session_file/86672527/NLEYWWCLSTPqEeUP.png";
 
 /** Pre-defined common exercises for quick selection */
-export const COMMON_EXERCISES: { name: string; type: "sets" | "duration"; description: string }[] = [
+export const COMMON_EXERCISES: { name: string; type: "sets" | "duration"; description: string; imageUrl?: string }[] = [
+  { name: "壶铃摇摆", type: "sets", description: "全身力量训练，锻炼臀部和核心", imageUrl: "/exercise-images/kettlebell-swing.png" },
+  { name: "深蹲", type: "sets", description: "下肢力量之王，强化腿部和臀部", imageUrl: "/exercise-images/squat.png" },
+  { name: "哑铃推举", type: "sets", description: "肩部和上肢力量训练", imageUrl: "/exercise-images/dumbbell-press.png" },
+  { name: "转呼啦圈", type: "duration", description: "有趣的核心训练，燃脂好帮手", imageUrl: "/exercise-images/hula-hoop.png" },
+  { name: "椭圆仪", type: "duration", description: "低冲击有氧运动，保护关节", imageUrl: "/exercise-images/elliptical.png" },
+  { name: "散步", type: "duration", description: "最简单的运动，放松身心", imageUrl: "/exercise-images/walking.png" },
+  { name: "泡沫滚轴放松", type: "duration", description: "肌肉放松恢复，缓解酸痛", imageUrl: "/exercise-images/foam-roller.png" },
+  { name: "炮筒划船", type: "sets", description: "背部力量训练，改善体态", imageUrl: "/exercise-images/landmine-row.png" },
+  { name: "太极拳", type: "duration", description: "身心合一，柔中带刚", imageUrl: "/exercise-images/tai-chi.png" },
   { name: "俯卧撑", type: "sets", description: "经典上肢训练" },
-  { name: "深蹲", type: "sets", description: "腿部力量基础" },
   { name: "平板支撑", type: "duration", description: "核心稳定训练" },
   { name: "引体向上", type: "sets", description: "背部拉力训练" },
   { name: "卷腹", type: "sets", description: "腹肌训练" },
   { name: "开合跳", type: "duration", description: "全身有氧热身" },
-  { name: "哑铃弯举", type: "sets", description: "二头肌训练" },
-  { name: "硬拉", type: "sets", description: "后链力量训练" },
-  { name: "卧推", type: "sets", description: "胸部力量训练" },
-  { name: "跑步", type: "duration", description: "有氧耐力训练" },
   { name: "跳绳", type: "duration", description: "全身协调有氧" },
-  { name: "瑜伽", type: "duration", description: "柔韧与放松" },
-  { name: "弓步蹲", type: "sets", description: "单腿力量训练" },
-  { name: "臀桥", type: "sets", description: "臀部激活训练" },
-  { name: "侧平举", type: "sets", description: "肩部训练" },
 ];

@@ -17,6 +17,16 @@ import {
   getWeeklyReview,
   getWeeklyReviews,
 } from "./db";
+import {
+  getTrainingRecordsByDate,
+  addTrainingRecord,
+  updateTrainingRecord,
+  deleteTrainingRecord,
+  getTrainingDates,
+  getExerciseStats,
+  getStarredExercises,
+  toggleStarExercise,
+} from "./exerciseDb";
 
 export const appRouter = router({
   system: systemRouter,
@@ -172,6 +182,82 @@ export const appRouter = router({
           gptComment: input.gptComment,
         });
         return { success: true };
+      }),
+  }),
+
+  exercise: router({
+    /** Get training records for a specific date */
+    getByDate: publicProcedure
+      .input(z.object({ dateStr: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }))
+      .query(async ({ input }) => {
+        return getTrainingRecordsByDate(input.dateStr);
+      }),
+
+    /** Add a training record */
+    add: publicProcedure
+      .input(
+        z.object({
+          dateStr: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+          exerciseId: z.string().min(1),
+          sets: z.number().min(1).optional(),
+          duration: z.string().optional(),
+          note: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const result = await addTrainingRecord({
+          dateStr: input.dateStr,
+          exerciseId: input.exerciseId,
+          sets: input.sets,
+          duration: input.duration,
+          note: input.note,
+        });
+        return { success: true, id: result.id };
+      }),
+
+    /** Update a training record */
+    update: publicProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          sets: z.number().min(1).optional(),
+          duration: z.string().optional(),
+          note: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await updateTrainingRecord(input);
+        return { success: true };
+      }),
+
+    /** Delete a training record */
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteTrainingRecord(input.id);
+        return { success: true };
+      }),
+
+    /** Get all dates with training data */
+    dates: publicProcedure.query(async () => {
+      return getTrainingDates();
+    }),
+
+    /** Get exercise statistics (count per exercise) */
+    stats: publicProcedure.query(async () => {
+      return getExerciseStats();
+    }),
+
+    /** Get all starred exercises */
+    starred: publicProcedure.query(async () => {
+      return getStarredExercises();
+    }),
+
+    /** Toggle star status for an exercise */
+    toggleStar: publicProcedure
+      .input(z.object({ exerciseId: z.string().min(1) }))
+      .mutation(async ({ input }) => {
+        return toggleStarExercise(input.exerciseId);
       }),
   }),
 });

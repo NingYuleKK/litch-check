@@ -54,3 +54,40 @@ export const dailyLogs = mysqlTable("daily_logs", {
 
 export type DailyLog = typeof dailyLogs.$inferSelect;
 export type InsertDailyLog = typeof dailyLogs.$inferInsert;
+
+// ─── Exercise Module Tables (v3.0) ────────────────────────────
+
+/**
+ * Training records: stores each exercise session for a date.
+ * Each row = one exercise entry on one date.
+ * - exerciseId: references PRESET_EXERCISES id (string slug)
+ * - sets: number of sets (optional)
+ * - duration: duration string like "30分钟" (optional)
+ * - note: additional note about this exercise
+ */
+export const trainingRecords = mysqlTable("training_records", {
+  id: int("id").autoincrement().primaryKey(),
+  dateStr: varchar("dateStr", { length: 10 }).notNull(),     // "2026-03-02"
+  exerciseId: varchar("exerciseId", { length: 64 }).notNull(), // "kettlebell-swing"
+  sets: int("sets"),                                           // number of sets
+  duration: varchar("duration", { length: 32 }),               // "30分钟"
+  note: text("note"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TrainingRecord = typeof trainingRecords.$inferSelect;
+export type InsertTrainingRecord = typeof trainingRecords.$inferInsert;
+
+/**
+ * Starred (favorited) exercises.
+ * Users can star exercises to add them to their "常用动作库".
+ */
+export const starredExercises = mysqlTable("starred_exercises", {
+  id: int("id").autoincrement().primaryKey(),
+  exerciseId: varchar("exerciseId", { length: 64 }).notNull().unique(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type StarredExercise = typeof starredExercises.$inferSelect;
+export type InsertStarredExercise = typeof starredExercises.$inferInsert;

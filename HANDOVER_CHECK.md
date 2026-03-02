@@ -28,7 +28,7 @@
 ### 3.1 每日打卡系统
 
 - **五类固定任务:**
-  - 包含"学英语"、"读书"、"AI/AIGC"、"锻炼"、"功课与正念"五个核心任务。
+  - 包含"学英语"、"读书"、"AI/AIGC"、"功课与正念"五个核心任务（原"锻炼"任务已升级为独立模块）。
   - 每个任务都有专属的颜色和手绘风格图标，便于视觉区分。
 
 - **每日打卡:**
@@ -100,22 +100,36 @@
   - 用户可以将 GPT 的批语粘贴到系统中，与当天的打卡记录关联。
 
 - **UI 位置:**
+<<<<<<< HEAD
   - 在每日结算弹窗（点击日历上某天弹出的详情弹窗）中，"今日随笔"下方显示 Root 批语区域。
   - 批语区域采用绿色系背景（`#B8E8D0`），与"今日随笔"的紫色系背景区分。
+=======
+  - 在每日结算弹窗（点击日历上某天弹出的详情弹窗）中，“今日随笔”下方显示 Root 批语区域。
+  - 批语区域采用绿色系背景（`#B8E8D0`），与“今日随笔”的紫色系背景区分。
+>>>>>>> 43392b5a69e73bcf41583f0bbb29776fdca8dce0
   - 使用 🪐 emoji 作为标识。
 
 - **交互逻辑:**
   - 导出区域内：仅显示静态批语内容（有批语时显示，无批语时不显示）。
+<<<<<<< HEAD
   - 导出区域外：提供编辑入口（无批语时显示虚线占位框，有批语时显示"编辑 Root 批语"链接）。
   - 编辑时展开 textarea，支持保存和取消。
 
 - **导出图片:**
   - 有批语时，导出的 PNG 图片在"今日随笔"下方显示批语区域，带 🪐 标识。
+=======
+  - 导出区域外：提供编辑入口（无批语时显示虚线占位框，有批语时显示“编辑 Root 批语”链接）。
+  - 编辑时展开 textarea，支持保存和取消。
+
+- **导出图片:**
+  - 有批语时，导出的 PNG 图片在“今日随笔”下方显示批语区域，带 🪐 标识。
+>>>>>>> 43392b5a69e73bcf41583f0bbb29776fdca8dce0
   - 无批语时，导出图片与现有效果完全一致。
 
 ### 3.6 锻炼模块 (v3.0 新增)
 
 - **功能描述:**
+<<<<<<< HEAD
   - 独立的锻炼训练记录模块，用于记录每天做了什么训练。
   - 数据存储使用 `localStorage`（本地存储），不依赖云端数据库。
   - 底部导航栏新增"锻炼"入口（哑铃图标）。
@@ -176,6 +190,30 @@
 | :--- | :--- |
 | `litch-check-training-records` | 所有训练记录数组 |
 | `litch-check-starred-actions` | 所有收藏的常用动作数组 |
+=======
+  - 在底部导航栏新增独立的"锻炼"模块/Tab，用于详细记录和管理用户的训练活动。
+
+- **训练记录:**
+  - 用户可以按天记录训练，每条记录包含多个训练动作。
+  - 每个动作可以记录**动作名称**、**组数/时长**、**备注**和**日期**。
+
+- **Star 标记 (常用动作库):**
+  - 用户可以 Star 某个训练动作，将其标记为"长期固定训练"。
+  - Star 过的动作会优先显示在动作选择列表中，形成一个"常用动作库"，方便快速添加。
+
+- **图片关联:**
+  - 每个训练动作都关联一张**司马黑形象的锻炼图**，风格与应用整体保持一致。
+  - V1.0 版本图片存储在本地 `client/public/exercise-images` 目录下。
+  - 预置了 9 个训练动作及其图片：壶铃摇摆、深蹲、哑铃推举、转呼啦圈、椭圆仪、散步、泡沫滚轴放松、炮筒划船、太极拳。
+
+- **导出卡片:**
+  - 每个训练记录都可以导出一张精美的图片卡片。
+  - 卡片为 3:4 竖版，上方是 1:1 的训练图片，下方是动作名称、简短说明、训练数据和日期。
+
+- **训练图鉴:**
+  - Star 过的训练项目会汇集在"图鉴"页面。
+  - 用户可以按**打卡次数**或**时间轴**排序查看，回顾自己的训练历史和偏好。
+>>>>>>> 43392b5a69e73bcf41583f0bbb29776fdca8dce0
 
 ## 4. 设计风格
 
@@ -196,6 +234,7 @@ litchs-check/
 │   │   ├── CalendarView.tsx             # 月日历视图
 │   │   ├── WeeklyReviews.tsx            # 历史周报列表
 │   │   ├── WeeklyReviewDetail.tsx       # 周报详情 + 导出
+<<<<<<< HEAD
 │   │   └── Exercise.tsx                 # 🆕 锻炼训练记录页面
 │   ├── components/
 │   │   ├── MemphisBackground.tsx        # 孟菲斯背景装饰
@@ -204,16 +243,30 @@ litchs-check/
 │   └── lib/
 │       ├── imageToBase64.ts             # 图片转 base64 工具
 │       └── exerciseStorage.ts           # 🆕 锻炼模块 localStorage 存储层
+=======
+│   │   ├── ExerciseTracker.tsx          # 锻炼模块主页面 (v3.0)
+│   │   └── ExerciseCollection.tsx       # 训练图鉴页面 (v3.0)
+│   └── components/
+│       ├── MemphisBackground.tsx        # 孟菲斯背景装饰
+│       ├── WeeklyReviewCard.tsx         # 周报结算卡片组件
+│       └── WeeklyReviewReminder.tsx     # 周一弹窗提醒
+>>>>>>> 43392b5a69e73bcf41583f0bbb29776fdca8dce0
 ├── server/
 │   ├── routers.ts                       # tRPC API 路由
 │   ├── db.ts                            # 数据库查询函数
+│   ├── exerciseDb.ts                    # 锻炼模块数据库操作 (v3.0)
 │   ├── weeklyReview.test.ts             # 周报 Vitest 测试
-│   └── checkin.test.ts                  # 打卡 Vitest 测试
+│   ├── checkin.test.ts                  # 打卡 Vitest 测试
+│   └── exercise.test.ts                 # 锻炼模块 Vitest 测试 (v3.0)
 ├── shared/
 │   ├── tasks.ts                         # 5 个任务类型定义
 │   ├── catImages.ts                     # 猫图片 CDN URL
 │   ├── weeklyReview.ts                  # 周报类型 + 猫评语逻辑
+<<<<<<< HEAD
 │   └── exercise.ts                      # 🆕 锻炼模块类型定义 + 预置动作
+=======
+│   └── exercises.ts                     # 锻炼模块类型定义和预置数据 (v3.0)
+>>>>>>> 43392b5a69e73bcf41583f0bbb29776fdca8dce0
 └── drizzle/
     └── schema.ts                        # 数据库表定义
 ```
@@ -252,9 +305,24 @@ litchs-check/
 | `trpc.gptComment.get` | Query | 获取指定日期的 Root 批语 |
 | `trpc.gptComment.save` | Mutation | 保存/更新 Root 批语 |
 
+<<<<<<< HEAD
 ### 锻炼模块 (v3.0 新增)
 
 > **注意:** 锻炼模块使用 `localStorage` 本地存储，无 API 端点。所有数据操作通过 `client/src/lib/exerciseStorage.ts` 进行。
+=======
+### 锻炼模块相关 (v3.0 新增)
+
+| 端点 | 方法 | 说明 |
+| :--- | :--- | :--- |
+| `trpc.exercise.getByDate` | Query | 获取指定日期的训练记录 |
+| `trpc.exercise.add` | Mutation | 添加一条训练记录 |
+| `trpc.exercise.update` | Mutation | 更新一条训练记录 |
+| `trpc.exercise.delete` | Mutation | 删除一条训练记录 |
+| `trpc.exercise.dates` | Query | 获取所有有训练记录的日期 |
+| `trpc.exercise.stats` | Query | 获取各项训练的统计数据（次数、最近日期） |
+| `trpc.exercise.starred` | Query | 获取所有收藏的训练动作 |
+| `trpc.exercise.toggleStar` | Mutation | 切换训练动作的收藏状态 |
+>>>>>>> 43392b5a69e73bcf41583f0bbb29776fdca8dce0
 
 ## 7. 数据库表
 
@@ -281,12 +349,38 @@ litchs-check/
 | createdAt | TIMESTAMP | 创建时间 |
 | updatedAt | TIMESTAMP | 更新时间 |
 
+<<<<<<< HEAD
 > **注意:** 周报数据不需要额外的数据库表，直接从 `checkins` 表按日期范围聚合查询。锻炼模块数据存储在 `localStorage`，不使用数据库。
+=======
+### training_records 表 (v3.0 新增)
+
+| 字段 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| id | INT (PK) | 自增主键 |
+| dateStr | VARCHAR(10) | 日期 "YYYY-MM-DD" |
+| exerciseId | VARCHAR(64) | 训练动作 ID (slug) |
+| sets | INT | 组数（可选） |
+| duration | VARCHAR(32) | 时长（可选） |
+| note | TEXT | 备注（可选） |
+| createdAt | TIMESTAMP | 创建时间 |
+| updatedAt | TIMESTAMP | 更新时间 |
+
+### starred_exercises 表 (v3.0 新增)
+
+| 字段 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| id | INT (PK) | 自增主键 |
+| exerciseId | VARCHAR(64) | 训练动作 ID (slug) |
+| createdAt | TIMESTAMP | 收藏时间 |
+
+> **注意:** 周报数据不需要额外的数据库表，直接从 `checkins` 表按日期范围聚合查询。
+>>>>>>> 43392b5a69e73bcf41583f0bbb29776fdca8dce0
 
 ## 8. 资源与部署
 
 - **吉祥物与图标:**
   - 4 张不同状态的猫吉祥物图片和 5 个手绘风格的任务图标均已上传至 S3 CDN。
+  - 9 张锻炼模块的司马黑图片存放于 `client/public/exercise-images` 目录下。
   - CDN 域名: `files.manuscdn.com`
 
 - **部署信息:**
@@ -326,4 +420,8 @@ litchs-check/
 | v2.1 | 2026-02-23 | **每日详情导出**：日历弹窗新增"导出图片"按鈕，将当天打卡记录导出为 PNG |
 | v2.2 | 2026-02-23 | **导出修复 + 司马黑命名**：导出时将图片转为 base64 内嵌，彻底解决 CORS 问题；胖黑猫正式命名「司马黑」 |
 | v2.3 | 2026-02-24 | **Root 批语功能**：每日结算弹窗新增 Root 批语区域，支持粘贴/编辑/保存 GPT 的点评，导出 PNG 图片包含批语内容 |
+<<<<<<< HEAD
 | v3.0 | 2026-03-02 | **锻炼模块**：新增独立锻炼训练记录页面，支持训练记录（组数/时长）、Star 标记常用动作库、图片展示、导出训练卡片（3:4 竖版 PNG），使用 localStorage 本地存储 |
+=======
+| v3.0 | 2026-03-02 | **锻炼模块**：新增独立锻炼 Tab，支持记录训练、Star 动作、关联图片、导出卡片、训练图鉴等功能 |
+>>>>>>> 43392b5a69e73bcf41583f0bbb29776fdca8dce0

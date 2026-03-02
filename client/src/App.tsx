@@ -29,7 +29,8 @@ function BottomNav() {
         {tabs.map((tab) => {
           const isActive =
             location === tab.path ||
-            (tab.path === "/weekly-reviews" && location.startsWith("/weekly-review"));
+            (tab.path === "/weekly-reviews" && location.startsWith("/weekly-review")) ||
+            (tab.path === "/exercise" && location.startsWith("/exercise"));
           const Icon = tab.icon;
           return (
             <Link
