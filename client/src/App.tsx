@@ -8,15 +8,18 @@ import DailyCheckin from "./pages/DailyCheckin";
 import CalendarView from "./pages/CalendarView";
 import WeeklyReviews from "./pages/WeeklyReviews";
 import WeeklyReviewDetail from "./pages/WeeklyReviewDetail";
+import ExerciseTracker from "./pages/ExerciseTracker";
+import ExerciseCollection from "./pages/ExerciseCollection";
 import MemphisBackground from "./components/MemphisBackground";
 import WeeklyReviewReminder from "./components/WeeklyReviewReminder";
-import { CheckCircle, Calendar, FileText } from "lucide-react";
+import { CheckCircle, Calendar, FileText, Dumbbell } from "lucide-react";
 
 function BottomNav() {
   const [location] = useLocation();
 
   const tabs = [
     { path: "/", label: "打卡", icon: CheckCircle },
+    { path: "/exercise", label: "锻炼", icon: Dumbbell },
     { path: "/calendar", label: "记录", icon: Calendar },
     { path: "/weekly-reviews", label: "周报", icon: FileText },
   ];
@@ -27,13 +30,14 @@ function BottomNav() {
         {tabs.map((tab) => {
           const isActive =
             location === tab.path ||
-            (tab.path === "/weekly-reviews" && location.startsWith("/weekly-review"));
+            (tab.path === "/weekly-reviews" && location.startsWith("/weekly-review")) ||
+            (tab.path === "/exercise" && location.startsWith("/exercise"));
           const Icon = tab.icon;
           return (
             <Link
               key={tab.path}
               href={tab.path}
-              className={`flex flex-col items-center gap-0.5 px-6 py-2 rounded-xl transition-all ${
+              className={`flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all ${
                 isActive
                   ? "text-primary scale-105"
                   : "text-muted-foreground hover:text-foreground"
@@ -67,6 +71,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={DailyCheckin} />
+      <Route path="/exercise" component={ExerciseTracker} />
+      <Route path="/exercise/collection" component={ExerciseCollection} />
       <Route path="/calendar" component={CalendarView} />
       <Route path="/weekly-reviews" component={WeeklyReviews} />
       <Route path="/weekly-review/:weekStart" component={WeeklyReviewDetail} />
